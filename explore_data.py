@@ -3,6 +3,7 @@ import os
 import cv2
 import pandas as pd
 import numpy as np
+import shutil
 
 import utils
 
@@ -83,6 +84,7 @@ class DataCleaner:
         for _, row in self.df_clean.iterrows():
             case = str(row["case"])
             day = str(row["day"])
+            slice = str(row['slice'])
 
             mask_lb = row["large_bowel"]
             mask_sb = row["small_bowel"]
@@ -91,19 +93,32 @@ class DataCleaner:
             h = row["height"]
             w = row["width"]
 
-            path = os.path.join(self.root, f"data/processed/masks/{case}/{day}/")
+            path = os.path.join(self.root, f"data/masks/{case}/{day}/{slice}")
             if (not os.path.exists(path)):
                 os.makedirs(path)
 
             img_lb = np.uint8(utils.rle_decode(mask_lb, (h,w,1)))
             img_lb = img_lb.astype(np.float32) *  255.
-            cv2.imwrite(path + "large_bowel.png", img_lb)
+            cv2.imwrite(f"{path}/large_bowel.png", img_lb)
             img_sb = np.uint8(utils.rle_decode(mask_sb, (h,w,1)))
             img_sb = img_sb.astype(np.float32) *  255.
-            cv2.imwrite(path + "small_bowel.png", img_sb)
+            cv2.imwrite(f"{path}/small_bowel.png", img_sb)
             img_s = np.uint8(utils.rle_decode(mask_s, (h,w,1)))
             img_s = img_s.astype(np.float32) *  255.
-            cv2.imwrite(path + "stomach.png", img_s)
+            cv2.imwrite(f"{path}/stomach.png", img_s)
+    
+    def generate_images(self): 
+        for _, row in self.df_clean.iterrows():
+            case = str(row["case"])
+            day = str(row["day"])
+            slice = str(row['slice'])
+
+            image_path_src = row["path"]
+            image_path_dst = os.path.join(self.root, f"data/images/{case}/{day}/{slice}")
+            if (not os.path.exists(image_path_dst)):
+                os.makedirs(image_path_dst)
+
+            shutil.copy(image_path_src, f"{image_path_dst}/img.png")       
 
 
 
@@ -111,7 +126,9 @@ def main():
     root = "uw_medison"
     data_cleaner = DataCleaner(root)
     data_cleaner.transform_dataframe()
+    data_cleaner.generate_images()
     data_cleaner.generate_masks()
+    
 
 
 
