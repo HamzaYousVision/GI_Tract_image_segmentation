@@ -1,6 +1,7 @@
 import numpy as np
-
-
+import yaml
+from types import SimpleNamespace
+import json
 def rle_encode(img):
     pixels = img.flatten()
     pixels = np.concatenate([[0], pixels, [0]])
@@ -18,3 +19,18 @@ def rle_decode(mask_rle, shape, color=1):
     for lo, hi in zip(starts, ends):
         img[lo:hi] = color
     return img.reshape(shape)
+
+def parse_yaml(yaml_path):
+    with open(yaml_path, "r") as f:
+        config_dict = yaml.load(f, Loader=yaml.FullLoader)
+        my_namespace = json.loads(json.dumps(
+            config_dict), object_hook=lambda item: SimpleNamespace(**item))
+
+        return my_namespace
+
+def parse_yaml_config(config_path):
+    config = parse_yaml(config_path)
+    return config
+
+def visualize_samples():
+    # TODO: visualize samples from dataset. Will be used for validating the Dataset and also to visualize the results of the model during training

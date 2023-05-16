@@ -33,15 +33,15 @@ class GITrackDataset(Dataset):
             index = index.tolist()
 
         image = Image.open(self.images[index])
-        mask_lb = Image.open(self.masks_large_bowel[index])
-        mask_sb = Image.open(self.masks_small_bowel[index])
-        mask_s = Image.open(self.masks_stomach[index])
+        maskmasks_large_bowel_lb_ = Image.open(self.masks_large_bowel[index])
+        masks_large_bowel_ = Image.open(self.masks_small_bowel[index])
+        masks_stomach_ = Image.open(self.masks_stomach[index])
 
         return {
             "image": self.transform(image),
-            "mask_lb": self.transform(mask_lb),
-            "mask_sb": self.transform(mask_sb),
-            "mask_s": self.transform(mask_s),
+            "mask_lb": self.transform(maskmasks_large_bowel_lb_),
+            "mask_sb": self.transform(masks_large_bowel_),
+            "mask_s": self.transform(masks_stomach_),
         }
 
 
